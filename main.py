@@ -4,9 +4,11 @@ from pydantic import BaseModel, Field
 import uvicorn
 from datetime import datetime
 import random
+from fastapi_mcp import FastApiMCP
 
 app = FastAPI()
-
+mcp = FastApiMCP(app)
+mcp.mount()
 # ==========================================
 # REQUEST MODELS
 # ==========================================
