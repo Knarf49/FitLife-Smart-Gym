@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "fitness-gym": {
+      "command": "C:\\Users\\Frank\\Github\\FitLife-Smart-Gym\\.venv\\Scripts\\python.exe",
+      "args": ["C:\\Users\\Frank\\Github\\FitLife-Smart-Gym\\mcp_server.py"]
+    }
+  }
+}
