@@ -3,6 +3,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(__file__))
 
+from typing import Optional
 from mcp.server.fastmcp import FastMCP
 from controller import FitnessBranch
 from entities import Bank
@@ -129,13 +130,13 @@ def create_class(activity_name: str, session_id: str, name: str, description: st
 @mcp.tool()
 def edit_class(
     class_id: str,
-    name: str = None,
-    description: str = None,
-    date: str = None,
-    time: str = None,
-    room_id: str = None,
-    trainer_id: str = None,
-    capacity: int = None,
+    name: Optional[str] = None,
+    description: Optional[str] = None,
+    date: Optional[str] = None,
+    time: Optional[str] = None,
+    room_id: Optional[str] = None,
+    trainer_id: Optional[str] = None,
+    capacity: Optional[int] = None,
 ) -> dict:
     """Edit an existing class (admin)"""
     update_data = {}
@@ -171,6 +172,7 @@ app = FastAPI(title="Fitness Branch API")
 
 mock_bank = Bank(name="Main API Bank", api_endpoint="https://bank.com/api")
 branch = FitnessBranch(bank_obj=mock_bank)
+seed_branch_with_test_data(branch, auto_login_system_admin=False)
 
 class LoginRequest(BaseModel):
     user_id: str = Field(json_schema_extra={"example": "M001"})
