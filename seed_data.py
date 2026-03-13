@@ -1,5 +1,9 @@
 from controller import FitnessBranch
-from entities import Admin, Trainer, StudioRoom, Activity, ClassSession, ClassSessionTime, Equipment
+from entities import (
+    Admin, Trainer, StudioRoom, Activity, ClassSession, Equipment,
+    ClassSessionTime, BronzeMember, SilverMember, GoldMember, Contract
+)
+from datetime import datetime, timedelta
 
 
 def seed_branch_with_test_data(branch: FitnessBranch, auto_login_system_admin: bool = False) -> None:
