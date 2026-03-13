@@ -102,7 +102,10 @@ async def view_usage_history():
 
 @app.put("/cancel_reservation/{reservation_id}", tags=["Member Use Cases"])
 async def cancel_reservation(reservation_id: str, simulated_time: Optional[datetime] = None):
-    "cancel class reservation"
+    """
+    To test the 4-hour rule, pass a simulated_time in the query!
+    Example: /cancel_reservation/RES001?simulated_time=2026-03-10T15:00:00
+    """
     return branch.cancel_reservation(reservation_id, simulated_time)
 
 @app.post("/check_in", tags=["Member Use Cases"])
