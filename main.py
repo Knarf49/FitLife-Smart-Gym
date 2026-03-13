@@ -183,6 +183,7 @@ async def create_class(body: CreateClassRequest):
         body.description, body.trainer_id, body.capacity,
         body.date, body.time_str, body.room_id
     )
+    
 
 if __name__ == "__main__":
     # Setup ngrok for public URL
