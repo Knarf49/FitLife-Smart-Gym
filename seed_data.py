@@ -65,6 +65,19 @@ def seed_branch_with_test_data(branch: FitnessBranch, auto_login_system_admin: b
 
     trainer1.get_teaching_schedule().append(class1)
     trainer2.get_teaching_schedule().append(class2)
+    
+    # Members (one per tier)
+    now = datetime.now()
+    contract_bronze = Contract(now, now + timedelta(days=30))
+    contract_silver = Contract(now, now + timedelta(days=30))
+    contract_gold = Contract(now, now + timedelta(days=30))
+
+    member1 = BronzeMember("M001", "Alice Brown", "alice@example.com", "password123", contract_bronze, "Bronze")
+    member2 = SilverMember("M002", "Bob Silver", "bob@example.com", "password123", contract_silver, "Silver")
+    member3 = GoldMember("M003", "Charlie Gold", "charlie@example.com", "password123", contract_gold, "Gold")
+    branch._FitnessBranch__members.append(member1)
+    branch._FitnessBranch__members.append(member2)
+    branch._FitnessBranch__members.append(member3)
 
     if auto_login_system_admin:
         branch.log_in("ADMIN_SYSTEM", "system_admin_123")
