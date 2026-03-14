@@ -62,24 +62,37 @@ def view_usage_history() -> dict:
     return branch.view_usage_history()
 
 @mcp.tool()
-def cancel_reservation(reservation_id: str) -> dict:
-    """Cancel a reservation"""
-    return branch.cancel_reservation(reservation_id)
+def cancel_reservation(reservation_id: str, simulated_time: Optional[str] = None) -> dict:
+    """Cancel a reservation. Optionally pass simulated_time (ISO format e.g. '2026-03-11T08:00:00') to test the 4-hour late cancellation rule."""
+    from datetime import datetime
+    parsed_time = datetime.fromisoformat(simulated_time) if simulated_time else None
+    return branch.cancel_reservation(reservation_id, parsed_time)
 
 @mcp.tool()
-def check_in(payment_method: str = "CREDIT-CARD") -> dict:
-    """Check in to the gym"""
-    return branch.check_in(payment_method)
+def check_in(payment_method: str = "CREDIT-CARD", simulated_time: Optional[str] = None) -> dict:
+    """Check in to the gym. Optionally pass simulated_time (ISO format e.g. '2026-03-11T08:00:00') to simulate checking in at a specific date/time."""
+    from datetime import datetime
+    parsed_time = datetime.fromisoformat(simulated_time) if simulated_time else None
+    return branch.check_in(payment_method, parsed_time)
 
 @mcp.tool()
-def check_out(payment_method: str = "CREDIT-CARD") -> dict:
-    """Check out from the gym"""
-    return branch.check_out(payment_method)
+def check_out(payment_method: str = "CREDIT-CARD", simulated_time: Optional[str] = None) -> dict:
+    """Check out from the gym. Optionally pass simulated_time (ISO format e.g. '2026-03-11T10:00:00') to simulate checking out at a specific date/time."""
+    from datetime import datetime
+    parsed_time = datetime.fromisoformat(simulated_time) if simulated_time else None
+    return branch.check_out(payment_method, parsed_time)
 
 @mcp.tool()
-def rent_equipment(equipment_name: str, quantity: int = 1) -> dict:
-    """Rent equipment"""
-    return branch.rent_equipments(equipment_name, quantity)
+def rent_equipment(equipment_name: str, quantity: int = 1, simulated_time: Optional[str] = None) -> dict:
+    """Rent equipment. Optionally pass simulated_time (ISO format e.g. '2026-03-15T08:35:00') to simulate renting at a specific date/time."""
+    from datetime import datetime
+    parsed_time = datetime.fromisoformat(simulated_time) if simulated_time else None
+    return branch.rent_equipments(equipment_name, quantity, parsed_time)
+
+@mcp.tool()
+def view_payment_history() -> dict:
+    """View payment history for the logged-in member"""
+    return branch.view_payment_history()
 
 # ==========================================
 # TRAINER TOOLS
@@ -90,9 +103,19 @@ def view_trainer_schedule() -> dict:
     return branch.view_schedules()
 
 @mcp.tool()
-def start_class(class_id: str) -> dict:
-    """Start a class"""
-    return branch.start_class(class_id)
+def start_class(class_id: str, simulated_time: Optional[str] = None) -> dict:
+    """Start a class, format for simulated_time is "%Y-%m-%d %H:%M" (or ISO format)"""
+    from datetime import datetime
+    parsed_time = None
+    if simulated_time:
+        try:
+            parsed_time = datetime.fromisoformat(simulated_time)
+        except ValueError:
+            try:
+                parsed_time = datetime.strptime(simulated_time, "%Y-%m-%d %H:%M")
+            except ValueError:
+                return {"error": "Invalid time format. Use ISO or YYYY-MM-DD HH:MM"}
+    return branch.start_class(class_id, parsed_time)
 
 @mcp.tool()
 def end_class(class_id: str) -> dict:
@@ -118,13 +141,13 @@ def register_member(user_id: str, name: str, email: str, password: str, tier_nam
     return branch.register_member(user_id, name, email, password, tier_name, payment_method)
 
 @mcp.tool()
-def renew_contract(user_id: str, payment_method: str = "CREDIT-CARD") -> dict:
-    """Renew member contract (admin)"""
-    return branch.renew_contract(user_id, payment_method)
+def renew_contract(user_id: str, new_tier_name: Optional[str] = None, payment_method: str = "CREDIT-CARD") -> dict:
+    """Renew member contract for 30 days (admin only). Optionally pass new_tier_name (Bronze, Silver, or Gold) to upgrade or downgrade the member's tier at the same time."""
+    return branch.renew_contract(user_id, new_tier_name=new_tier_name, payment_method=payment_method)
 
 @mcp.tool()
 def create_class(activity_name: str, session_id: str, name: str, description: str, trainer_id: str, capacity: int, date: str, time_str: str, room_id: str) -> dict:
-    """Create a new class (admin)"""
+    """Create a new class (admin) session_id for ID, time_str for TIME which we have three options are MORNING AFTERNOON EVENNING"""
     return branch.create_class(activity_name, session_id, name, description, trainer_id, capacity, date, time_str, room_id)
 
 @mcp.tool()
@@ -155,157 +178,6 @@ def edit_class(
     if trainer_id is not None:
         update_data["trainer_id"] = trainer_id
     return branch.edit_class(class_id, update_data)
-
-if __name__ == "__main__":
-    mcp.run()
-
-
-from fastapi import FastAPI
-from fastapi_mcp import FastApiMCP
-from controller import FitnessBranch
-from entities import Bank
-from typing import Optional
-from datetime import datetime
-from pydantic import BaseModel, Field
-
-app = FastAPI(title="Fitness Branch API")
-
-mock_bank = Bank(name="Main API Bank", api_endpoint="https://bank.com/api")
-branch = FitnessBranch(bank_obj=mock_bank)
-seed_branch_with_test_data(branch, auto_login_system_admin=False)
-
-class LoginRequest(BaseModel):
-    user_id: str = Field(json_schema_extra={"example": "M001"})
-    password: str = Field(json_schema_extra={"example": "password123"})
-
-class BookClassRequest(BaseModel):
-    class_id: str = Field(json_schema_extra={"example": "C001"})
-
-class RentEquipmentRequest(BaseModel):
-    equipment_name: str = Field(json_schema_extra={"example": "Yoga Mat"})
-    quantity: int = Field(default=1, json_schema_extra={"example": 1})
-
-class RegisterMemberRequest(BaseModel):
-    user_id: str = Field(json_schema_extra={"example": "M001"})
-    name: str = Field(json_schema_extra={"example": "John Doe"})
-    email: str = Field(json_schema_extra={"example": "john@example.com"})
-    password: str = Field(json_schema_extra={"example": "password123"})
-    tier_name: str = Field(json_schema_extra={"example": "Gold"})
-    payment_method: str = Field(default="CREDIT-CARD", json_schema_extra={"example": "CREDIT-CARD"})
-
-class EditClassRequest(BaseModel):
-    name: Optional[str] = Field(default=None, json_schema_extra={"example": "Advanced Yoga (Updated)"})
-    description: Optional[str] = Field(default=None, json_schema_extra={"example": "Updated flow with mobility warmup"})
-    date: Optional[str] = Field(default=None, json_schema_extra={"example": "2026-04-11"})
-    room_id: Optional[str] = Field(default=None, json_schema_extra={"example": "R102"})
-    trainer_id: Optional[str] = Field(default=None, json_schema_extra={"example": "T002"})
-    capacity: Optional[int] = Field(default=None, json_schema_extra={"example": 20})
-    time: Optional[str] = Field(default=None, json_schema_extra={"example": "AFTERNOON"})
-
-class CreateClassRequest(BaseModel):
-    activity_name: str = Field(json_schema_extra={"example": "Yoga"})
-    session_id: str = Field(json_schema_extra={"example": "C001"})
-    name: str = Field(json_schema_extra={"example": "Intro to Zen"})
-    description: str = Field(json_schema_extra={"example": "Basic yoga flow"})
-    trainer_id: str = Field(json_schema_extra={"example": "T001"})
-    capacity: int = Field(json_schema_extra={"example": 20})
-    date: str = Field(json_schema_extra={"example": "2026-04-10"})
-    time_str: str = Field(json_schema_extra={"example": "MORNING"})
-    room_id: str = Field(json_schema_extra={"example": "R101"})
-
-@app.post("/login", tags=["User Use Cases"])
-async def login(body: LoginRequest):
-    return branch.log_in(body.user_id, body.password)
-
-@app.post("/logout", tags=["User Use Cases"])
-async def logout():
-    return branch.log_out()
-
-@app.get("/notifications", tags=["User Use Cases"])
-async def view_notifications(notification_id: str = None):
-    return branch.view_notification(notification_id)
-
-@app.get("/search_classes", tags=["Member Use Cases"])
-async def search_classes(activity_name: str = None):
-    return branch.search_class(activity_name)
-
-@app.post("/book_class", tags=["Member Use Cases"])
-async def book_class(body: BookClassRequest):
-    return branch.book_class(body.class_id)
-
-@app.get("/my_reservations", tags=["Member Use Cases"])
-async def view_reservation():
-    return branch.view_reservation()
-
-@app.get("/equipment", tags=["Member Use Cases"])
-async def view_equipment(name: str = None):
-    return branch.view_available_equipment(name)
-
-@app.get("/usage_history", tags=["Member Use Cases"])
-async def view_usage_history():
-    return branch.view_usage_history()
-
-@app.put("/cancel_reservation/{reservation_id}", tags=["Member Use Cases"])
-async def cancel_reservation(reservation_id: str, simulated_time: Optional[datetime] = None):
-    return branch.cancel_reservation(reservation_id, simulated_time)
-
-@app.post("/check_in", tags=["Member Use Cases"])
-async def check_in(payment_method: str = "CREDIT-CARD", simulated_time: Optional[datetime] = None):
-    return branch.check_in(payment_method, simulated_time)
-
-@app.put("/check_out", tags=["Member Use Cases"])
-async def check_out(payment_method: str = "CREDIT-CARD", simulated_time: Optional[datetime] = None):
-    return branch.check_out(payment_method, simulated_time)
-
-@app.post("/rent_equipment", tags=["Member Use Cases"])
-async def rent_equipment(body: RentEquipmentRequest):
-    return branch.rent_equipments(body.equipment_name, body.quantity)
-
-@app.get("/trainer_schedule", tags=["Trainer Use Cases"])
-async def view_teaching_schedule():
-    return branch.view_schedules()
-
-@app.put("/trainer/start_class/{class_id}", tags=["Trainer Use Cases"])
-async def start_class(class_id: str):
-    return branch.start_class(class_id)
-
-@app.put("/trainer/end_class/{class_id}", tags=["Trainer Use Cases"])
-async def end_class(class_id: str):
-    return branch.end_class(class_id)
-
-@app.get("/admin/classes", tags=["Admin Use Cases"])
-async def view_all_classes():
-    return branch.view_classes()
-
-@app.delete("/admin/classes/{class_id}", tags=["Admin Use Cases"])
-async def cancel_class(class_id: str):
-    return branch.cancel_class(class_id)
-
-@app.post("/admin/register", tags=["Admin Use Cases"])
-async def admin_register_member(body: RegisterMemberRequest):
-    return branch.register_member(
-        body.user_id, body.name, body.email,
-        body.password, body.tier_name, body.payment_method
-    )
-
-@app.put("/admin/renew/{user_id}", tags=["Admin Use Cases"])
-async def admin_renew_contract(user_id: str, payment_method: str = "CREDIT-CARD", simulated_time: Optional[datetime] = None):
-    return branch.renew_contract(user_id, payment_method, simulated_time)
-
-@app.put("/admin/classes/{class_id}", tags=["Admin Use Cases"])
-async def edit_class(class_id: str, body: EditClassRequest):
-    update_data = {k: v for k, v in body.model_dump().items() if v is not None}
-    return branch.edit_class(class_id, update_data)
-
-@app.post("/admin/classes", tags=["Admin Use Cases"])
-async def create_class(body: CreateClassRequest):
-    return branch.create_class(
-        body.activity_name, body.session_id, body.name,
-        body.description, body.trainer_id, body.capacity,
-        body.date, body.time_str, body.room_id
-    )
-
-mcp = FastApiMCP(app)
 
 if __name__ == "__main__":
     mcp.run()
