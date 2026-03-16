@@ -70,21 +70,18 @@ def check_in(payment_method: str = "CREDIT-CARD", simulated_time: Optional[str] 
     from datetime import datetime
     parsed_time = datetime.fromisoformat(simulated_time) if simulated_time else None
     return branch.check_in(payment_method, parsed_time)
-
 @mcp.tool()
 def check_out(payment_method: str = "CREDIT-CARD", simulated_time: Optional[str] = None) -> dict:
     """Check out from the gym. Optionally pass simulated_time (ISO format e.g. '2026-03-11T10:00:00') to simulate checking out at a specific date/time."""
     from datetime import datetime
     parsed_time = datetime.fromisoformat(simulated_time) if simulated_time else None
     return branch.check_out(payment_method, parsed_time)
-
 @mcp.tool()
 def rent_equipment(equipment_name: str, quantity: int = 1, simulated_time: Optional[str] = None) -> dict:
     """Rent equipment. Optionally pass simulated_time (ISO format e.g. '2026-03-15T08:35:00') to simulate renting at a specific date/time."""
     from datetime import datetime
     parsed_time = datetime.fromisoformat(simulated_time) if simulated_time else None
     return branch.rent_equipments(equipment_name, quantity, parsed_time)
-
 @mcp.tool()
 def view_payment_history() -> dict:
     """View payment history for the logged-in member"""
