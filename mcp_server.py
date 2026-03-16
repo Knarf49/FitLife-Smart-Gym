@@ -51,12 +51,10 @@ def view_my_reservations() -> dict:
 def view_equipment(name: str = None) -> dict:
     """View available equipment"""
     return branch.view_available_equipment(name)
-
 @mcp.tool()
 def view_usage_history() -> dict:
     """View usage history"""
     return branch.view_usage_history()
-
 @mcp.tool()
 def cancel_reservation(reservation_id: str, simulated_time: Optional[str] = None) -> dict:
     """Cancel a reservation. Optionally pass simulated_time (ISO format e.g. '2026-03-11T08:00:00') to test the 4-hour late cancellation rule."""
