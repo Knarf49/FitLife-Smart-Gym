@@ -85,7 +85,7 @@ def seed_branch_with_test_data(branch: FitnessBranch, auto_login_system_admin: b
     trainer2.get_teaching_schedule().append(class2)
     trainer3.get_teaching_schedule().append(class3)
 
-    # Members (one per tier)
+    # Members (one / tier)
     now = datetime.now()
     contract_bronze = Contract(now, now + timedelta(days=30))
     contract_silver = Contract(now, now + timedelta(days=30))
