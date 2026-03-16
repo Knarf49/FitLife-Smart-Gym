@@ -134,22 +134,18 @@ def view_all_classes() -> dict:
 def cancel_class(class_id: str) -> dict:
     """Cancel a class (admin)"""
     return branch.cancel_class(class_id)
-
 @mcp.tool()
 def register_member(user_id: str, name: str, email: str, password: str, tier_name: str, payment_method: str = "CREDIT-CARD") -> dict:
     """Register a new member (admin)"""
     return branch.register_member(user_id, name, email, password, tier_name, payment_method)
-
 @mcp.tool()
 def renew_contract(user_id: str, new_tier_name: Optional[str] = None, payment_method: str = "CREDIT-CARD") -> dict:
     """Renew member contract for 30 days (admin only). Optionally pass new_tier_name (Bronze, Silver, or Gold) to upgrade or downgrade the member's tier at the same time."""
     return branch.renew_contract(user_id, new_tier_name=new_tier_name, payment_method=payment_method)
-
 @mcp.tool()
 def create_class(activity_name: str, session_id: str, name: str, description: str, trainer_id: str, capacity: int, date: str, time_str: str, room_id: str) -> dict:
     """Create a new class (admin) session_id for ID, time_str for TIME which we have three options are MORNING AFTERNOON EVENNING"""
     return branch.create_class(activity_name, session_id, name, description, trainer_id, capacity, date, time_str, room_id)
-
 @mcp.tool()
 def edit_class(
     class_id: str,
@@ -178,6 +174,5 @@ def edit_class(
     if trainer_id is not None:
         update_data["trainer_id"] = trainer_id
     return branch.edit_class(class_id, update_data)
-
 if __name__ == "__main__":
     mcp.run()
