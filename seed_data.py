@@ -96,7 +96,6 @@ def seed_branch_with_test_data(branch: FitnessBranch, auto_login_system_admin: b
     branch._FitnessBranch__members.append(member1)
     branch._FitnessBranch__members.append(member2)
     branch._FitnessBranch__members.append(member3)
-
     if auto_login_system_admin:
         branch.log_in("ADMIN_SYSTEM", "system_admin_123")
 
