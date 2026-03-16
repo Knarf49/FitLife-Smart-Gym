@@ -93,7 +93,6 @@ def rent_equipment(equipment_name: str, quantity: int = 1, simulated_time: Optio
 def view_payment_history() -> dict:
     """View payment history for the logged-in member"""
     return branch.view_payment_history()
-
 # ==========================================
 # TRAINER TOOLS
 # ==========================================
@@ -101,7 +100,6 @@ def view_payment_history() -> dict:
 def view_trainer_schedule() -> dict:
     """View trainer's teaching schedule"""
     return branch.view_schedules()
-
 @mcp.tool()
 def start_class(class_id: str, simulated_time: Optional[str] = None) -> dict:
     """Start a class, format for simulated_time is "%Y-%m-%d %H:%M" (or ISO format)"""
