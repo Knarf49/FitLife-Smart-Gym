@@ -1,20 +1,16 @@
 import sys
 import os
-
 sys.path.insert(0, os.path.dirname(__file__))
-
 from typing import Optional
 from mcp.server.fastmcp import FastMCP
 from controller import FitnessBranch
 from entities import Bank
 from seed_data import seed_branch_with_test_data
-
 mock_bank = Bank(name="Main API Bank", api_endpoint="https://bank.com/api")
 branch = FitnessBranch(bank_obj=mock_bank)
 seed_branch_with_test_data(branch, auto_login_system_admin=True)
 
 mcp = FastMCP("FitLife Gym")
-
 # ==========================================
 # USER TOOLS
 # ==========================================
