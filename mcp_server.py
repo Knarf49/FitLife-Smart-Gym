@@ -46,7 +46,6 @@ def book_class(class_id: str) -> dict:
 def view_my_reservations() -> dict:
     """View member's reservations"""
     return branch.view_reservation()
-
 @mcp.tool()
 def view_equipment(name: str = None) -> dict:
     """View available equipment"""
