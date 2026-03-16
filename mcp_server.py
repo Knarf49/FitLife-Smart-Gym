@@ -116,12 +116,10 @@ def start_class(class_id: str, simulated_time: Optional[str] = None) -> dict:
             except ValueError:
                 return {"error": "Invalid time format. Use ISO or YYYY-MM-DD HH:MM"}
     return branch.start_class(class_id, parsed_time)
-
 @mcp.tool()
 def end_class(class_id: str) -> dict:
     """End a class"""
     return branch.end_class(class_id)
-
 # ==========================================
 # ADMIN TOOLS
 # ==========================================
@@ -129,7 +127,6 @@ def end_class(class_id: str) -> dict:
 def view_all_classes() -> dict:
     """View all classes (admin)"""
     return branch.view_classes()
-
 @mcp.tool()
 def cancel_class(class_id: str) -> dict:
     """Cancel a class (admin)"""
