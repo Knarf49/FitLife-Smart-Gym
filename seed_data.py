@@ -100,3 +100,4 @@ def seed_branch_with_test_data(branch: FitnessBranch, auto_login_system_admin: b
 
     if auto_login_system_admin:
         branch.log_in("ADMIN_SYSTEM", "system_admin_123")
+
