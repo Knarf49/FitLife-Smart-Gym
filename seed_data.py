@@ -5,7 +5,6 @@ from entities import (
 )
 from datetime import datetime, timedelta
 
-
 def seed_branch_with_test_data(branch: FitnessBranch, auto_login_system_admin: bool = False) -> None:
     """Populate a FitnessBranch instance with the same baseline test data used by MCP."""
     # System admin
